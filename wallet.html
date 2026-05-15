@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Wallet</title>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+
+body{
+background:#0b1020;
+font-family:Arial;
+color:white;
+padding:15px;
+padding-bottom:80px;
+}
+
+.box{
+background:#131c39;
+padding:18px;
+border-radius:18px;
+margin-bottom:15px;
+}
+
+.btn{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:#14b8a6;
+color:white;
+font-size:16px;
+font-weight:bold;
+margin-top:12px;
+}
+
+.withdraw-btn{
+background:red;
+}
+
+.input-box{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+margin-top:12px;
+background:#1b254b;
+color:white;
+font-size:16px;
+outline:none;
+}
+
+.empty{
+text-align:center;
+padding:30px;
+color:#bbb;
+}
+
+.history-box{
+background:#1b254b;
+padding:15px;
+border-radius:14px;
+margin-top:12px;
+display:none;
+}
+
+.history-box p{
+margin-bottom:6px;
+}
+
+.bottom-menu{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+background:#131c39;
+display:flex;
+justify-content:space-around;
+padding:14px 0;
+}
+
+.bottom-menu a{
+color:white;
+text-decoration:none;
+font-size:14px;
+text-align:center;
+}
+
+.bottom-menu i{
+display:block;
+font-size:22px;
+margin-bottom:4px;
+}
+
+.active{
+color:#14b8a6;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- DEPOSIT -->
+
+<div class="box">
+
+<h2>EasyPaisa</h2>
+
+<p>0300-0000000</p>
+
+<input type="number"
+id="depositAmount"
+placeholder="Enter Deposit Amount"
+class="input-box">
+
+<button class="btn"
+onclick="submitDeposit()">
+
+Deposit
+
+</button>
+
+</div>
+
+<!-- WITHDRAW -->
+
+<div class="box">
+
+<h2>JazzCash</h2>
+
+<p>0300-0000000</p>
+
+<input type="number"
+id="withdrawAmount"
+placeholder="Enter Withdraw Amount"
+class="input-box">
+
+<button class="btn withdraw-btn"
+onclick="submitWithdraw()">
+
+Withdraw
+
+</button>
+
+</div>
+
+<!-- HISTORY -->
+
+<div class="box">
+
+<h2>
+Recent Activity
+</h2>
+
+<div class="empty"
+id="emptyHistory">
+
+<i class="fa-solid fa-rotate"
+style="font-size:40px;color:#14b8a6;"></i>
+
+<p>
+No History Found
+</p>
+
+</div>
+
+<div class="history-box"
+id="historyBox">
+
+<p id="historyText"></p>
+
+</div>
+
+</div>
+
+<!-- BOTTOM MENU -->
+
+<div class="bottom-menu">
+
+<a href="dashboard.html">
+
+<i class="fa-solid fa-house"></i>
+
+Home
+
+</a>
+
+<a href="wallet.html"
+class="active">
+
+<i class="fa-solid fa-wallet"></i>
+
+Wallet
+
+</a>
+
+<a href="games.html">
+
+<i class="fa-solid fa-gamepad"></i>
+
+Games
+
+</a>
+
+<a href="profile.html">
+
+<i class="fa-solid fa-user"></i>
+
+Profile
+
+</a>
+
+</div>
+
+<!-- FIREBASE -->
+
+<script type="module">
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+
+getFirestore,
+collection,
+addDoc
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+
+getAuth,
+onAuthStateChanged
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyDco0KJGaXb-_f80pSSZQ7u6nKE9M9H-hI",
+
+authDomain: "proearn-81989.firebaseapp.com",
+
+projectId: "proearn-81989",
+
+storageBucket: "proearn-81989.firebasestorage.app",
+
+messagingSenderId: "394148226234",
+
+appId: "1:394148226234:web:75456cdd11a2fa32b20e83"
+
+};
+
+const app =
+initializeApp(firebaseConfig);
+
+const db =
+getFirestore(app);
+
+const auth =
+getAuth(app);
+
+let currentUser = null;
+
+onAuthStateChanged(auth,(user)=>{
+
+if(user){
+
+currentUser = user;
+
+}else{
+
+window.location.href =
+"login.html";
+
+}
+
+});
+
+/* DEPOSIT */
+
+window.submitDeposit =
+async function(){
+
+const amount =
+document.getElementById("depositAmount").value;
+
+if(amount == ""){
+
+alert("Enter Deposit Amount");
+
+return;
+
+}
+
+await addDoc(
+collection(db,"depositRequests"),
+{
+
+email:
+currentUser.email,
+
+amount:
+amount,
+
+status:
+"Pending",
+
+type:
+"Deposit",
+
+date:
+new Date().toLocaleString()
+
+}
+
+);
+
+alert("Deposit Request Submitted");
+
+document.getElementById("depositAmount").value = "";
+
+document.getElementById("emptyHistory")
+.style.display = "none";
+
+document.getElementById("historyBox")
+.style.display = "block";
+
+document.getElementById("historyText")
+.innerHTML =
+
+"Deposit Request: PKR " +
+amount +
+" (Pending)";
+
+}
+
+/* WITHDRAW */
+
+window.submitWithdraw =
+async function(){
+
+const amount =
+document.getElementById("withdrawAmount").value;
+
+if(amount == ""){
+
+alert("Enter Withdraw Amount");
+
+return;
+
+}
+
+await addDoc(
+collection(db,"withdrawRequests"),
+{
+
+email:
+currentUser.email,
+
+amount:
+amount,
+
+status:
+"Pending",
+
+type:
+"Withdraw",
+
+date:
+new Date().toLocaleString()
+
+}
+
+);
+
+alert("Withdraw Request Submitted");
+
+document.getElementById("withdrawAmount").value = "";
+
+document.getElementById("emptyHistory")
+.style.display = "none";
+
+document.getElementById("historyBox")
+.style.display = "block";
+
+document.getElementById("historyText")
+.innerHTML =
+
+"Withdraw Request: PKR " +
+amount +
+" (Pending)";
+
+}
+
+</script>
+
+</body>
+
+</html>

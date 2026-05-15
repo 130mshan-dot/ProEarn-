@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>ProEarn Admin Login</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+
+background:#0b1020;
+
+height:100vh;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+padding:20px;
+
+}
+
+/* LOGIN BOX */
+
+.login-box{
+
+width:100%;
+max-width:400px;
+
+background:#131c39;
+
+padding:30px 25px;
+
+border-radius:22px;
+
+color:white;
+
+}
+
+/* LOGO */
+
+.logo{
+
+text-align:center;
+margin-bottom:25px;
+
+}
+
+.logo i{
+
+font-size:65px;
+color:#14b8a6;
+margin-bottom:12px;
+
+}
+
+.logo h1{
+
+font-size:30px;
+
+}
+
+.logo span{
+
+color:#14b8a6;
+
+}
+
+/* INPUT */
+
+.input-box{
+
+margin-bottom:18px;
+position:relative;
+
+}
+
+.input-box input{
+
+width:100%;
+
+padding:15px;
+
+border:none;
+
+border-radius:12px;
+
+background:#1b254b;
+
+color:white;
+
+font-size:16px;
+
+outline:none;
+
+padding-right:50px;
+
+}
+
+/* EYE ICON */
+
+.eye-icon{
+
+position:absolute;
+
+right:15px;
+
+top:50%;
+
+transform:translateY(-50%);
+
+font-size:18px;
+
+color:#14b8a6;
+
+}
+
+/* BUTTON */
+
+.login-btn{
+
+width:100%;
+
+padding:15px;
+
+border:none;
+
+border-radius:12px;
+
+background:#14b8a6;
+
+color:white;
+
+font-size:17px;
+
+font-weight:bold;
+
+margin-top:10px;
+
+}
+
+.note{
+
+text-align:center;
+
+margin-top:18px;
+
+color:#bbb;
+
+font-size:14px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+<!-- LOGO -->
+
+<div class="logo">
+
+<i class="fa-solid fa-user-shield"></i>
+
+<h1>PRO<span>EARN</span></h1>
+
+<p>
+Admin Panel Login
+</p>
+
+</div>
+
+<!-- EMAIL -->
+
+<div class="input-box">
+
+<input type="email"
+id="adminEmail"
+placeholder="Admin Email">
+
+</div>
+
+<!-- PASSWORD -->
+
+<div class="input-box">
+
+<input type="password"
+id="adminPassword"
+placeholder="Admin Password">
+
+<i class="fa-solid fa-eye eye-icon"
+onclick="togglePassword()"></i>
+
+</div>
+
+<!-- BUTTON -->
+
+<button class="login-btn"
+onclick="adminLogin()">
+
+Login Admin Panel
+
+</button>
+
+<p class="note">
+
+Only Admin Can Access
+
+</p>
+
+</div>
+
+<!-- FIREBASE -->
+
+<script type="module">
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+
+getAuth,
+signInWithEmailAndPassword
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyDco0KJGaXb-_f80pSSZQ7u6nKE9M9H-hI",
+
+authDomain: "proearn-81989.firebaseapp.com",
+
+projectId: "proearn-81989",
+
+storageBucket: "proearn-81989.firebasestorage.app",
+
+messagingSenderId: "394148226234",
+
+appId: "1:394148226234:web:75456cdd11a2fa32b20e83"
+
+};
+
+const app =
+initializeApp(firebaseConfig);
+
+const auth =
+getAuth(app);
+
+/* LOGIN */
+
+window.adminLogin = function(){
+
+const email =
+document.getElementById("adminEmail").value;
+
+const password =
+document.getElementById("adminPassword").value;
+
+signInWithEmailAndPassword(
+auth,
+email,
+password
+)
+
+.then((userCredential)=>{
+
+alert("Welcome Admin");
+
+window.location.href =
+"admin.html";
+
+})
+
+.catch((error)=>{
+
+alert(error.message);
+
+});
+
+}
+
+/* SHOW PASSWORD */
+
+window.togglePassword = function(){
+
+const passwordInput =
+document.getElementById("adminPassword");
+
+if(passwordInput.type === "password"){
+
+passwordInput.type = "text";
+
+}else{
+
+passwordInput.type = "password";
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>

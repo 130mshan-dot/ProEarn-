@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>ProEarn Admin Panel</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:#0b1020;
+color:white;
+padding:15px;
+padding-bottom:60px;
+}
+
+/* HEADER */
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.logo{
+font-size:28px;
+font-weight:bold;
+}
+
+.logo span{
+color:#14b8a6;
+}
+
+/* TOP STATS */
+
+.stats{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-bottom:20px;
+}
+
+.stat-box{
+background:#131c39;
+padding:20px;
+border-radius:18px;
+text-align:center;
+}
+
+.stat-box h3{
+font-size:14px;
+color:#bbb;
+margin-bottom:10px;
+}
+
+.stat-box p{
+font-size:24px;
+font-weight:bold;
+}
+
+/* MAIN BOX */
+
+.main-box{
+background:#131c39;
+padding:18px;
+border-radius:18px;
+margin-bottom:18px;
+}
+
+.main-box h2{
+font-size:20px;
+margin-bottom:8px;
+}
+
+.main-box p{
+color:#bbb;
+font-size:14px;
+margin-bottom:15px;
+}
+
+/* EMPTY */
+
+.empty-box{
+background:#1b254b;
+padding:25px;
+border-radius:15px;
+text-align:center;
+margin-top:10px;
+}
+
+.empty-box i{
+font-size:42px;
+color:#14b8a6;
+margin-bottom:12px;
+}
+
+.empty-box p{
+color:#bbb;
+}
+
+/* REQUEST */
+
+.request-box{
+background:#1b254b;
+padding:15px;
+border-radius:14px;
+margin-top:12px;
+display:block;
+}
+
+.request-box p{
+margin-bottom:7px;
+}
+
+/* BUTTONS */
+
+.btn-row{
+display:flex;
+gap:10px;
+margin-top:12px;
+}
+
+.btn{
+flex:1;
+padding:12px;
+border:none;
+border-radius:12px;
+font-weight:bold;
+font-size:15px;
+color:white;
+}
+
+.approve{
+background:#14b8a6;
+}
+
+.reject{
+background:red;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<div class="header">
+
+<div class="logo">
+PRO<span>EARN</span>
+</div>
+
+<i class="fa-solid fa-user-shield"
+style="font-size:28px;color:#14b8a6;"></i>
+
+</div>
+
+<!-- STATS -->
+
+<div class="stats">
+
+<div class="stat-box">
+
+<h3>Total Users</h3>
+
+<p id="totalUsers">0</p>
+
+</div>
+
+<div class="stat-box">
+
+<h3>Total Deposit</h3>
+
+<p id="totalDeposit">PKR 0</p>
+
+</div>
+
+<div class="stat-box">
+
+<h3>Total Withdraw</h3>
+
+<p id="totalWithdraw">PKR 0</p>
+
+</div>
+
+<div class="stat-box">
+
+<h3>Total Profit</h3>
+
+<p id="totalProfit">PKR 0</p>
+
+</div>
+
+</div>
+
+<!-- DEPOSIT SECTION -->
+
+<div class="main-box">
+
+<h2>
+Deposit Requests
+</h2>
+
+<p>
+Users deposit requests will appear here.
+</p>
+
+<div id="depositContainer">
+
+<div class="empty-box"
+id="depositEmpty">
+
+<i class="fa-solid fa-wallet"></i>
+
+<p>
+No Deposit Requests
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- WITHDRAW SECTION -->
+
+<div class="main-box">
+
+<h2>
+Withdraw Requests
+</h2>
+
+<p>
+Users withdraw requests will appear here.
+</p>
+
+<div id="withdrawContainer">
+
+<div class="empty-box"
+id="withdrawEmpty">
+
+<i class="fa-solid fa-money-bill-wave"></i>
+
+<p>
+No Withdraw Requests
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- USERS SECTION -->
+
+<div class="main-box">
+
+<h2>
+Registered Users
+</h2>
+
+<p>
+All registered users will appear here.
+</p>
+
+<div id="usersContainer">
+
+<div class="empty-box"
+id="usersEmpty">
+
+<i class="fa-solid fa-users"></i>
+
+<p>
+No Users Found
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- FIREBASE -->
+<!-- FIREBASE -->
+
+<script type="module">
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+
+getFirestore,
+collection,
+getDocs,
+doc,
+updateDoc
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyDco0KJGaXb-_f80pSSZQ7u6nKE9M9H-hI",
+
+authDomain: "proearn-81989.firebaseapp.com",
+
+projectId: "proearn-81989",
+
+storageBucket: "proearn-81989.firebasestorage.app",
+
+messagingSenderId: "394148226234",
+
+appId: "1:394148226234:web:75456cdd11a2fa32b20e83"
+
+};
+
+const app =
+initializeApp(firebaseConfig);
+
+const db =
+getFirestore(app);
+
+/* TOTALS */
+
+let totalUsers = 0;
+
+let totalDeposit = 0;
+
+let totalWithdraw = 0;
+
+/* DEPOSIT REQUESTS */
+
+const depositSnap =
+await getDocs(
+collection(db,"depositRequests")
+);
+
+depositSnap.forEach((docItem)=>{
+
+document.getElementById(
+"depositEmpty"
+).style.display = "none";
+
+const data = docItem.data();
+
+totalDeposit += Number(data.amount);
+
+document.getElementById(
+"depositContainer"
+).innerHTML += `
+
+<div class="request-box">
+
+<p><b>Email:</b>
+${data.email}</p>
+
+<p><b>Amount:</b>
+PKR ${data.amount}</p>
+
+<p><b>Status:</b>
+${data.status}</p>
+
+<div class="btn-row">
+
+<button class="btn approve"
+onclick="approveDeposit(
+'${docItem.id}',
+'${data.email}',
+${data.amount}
+)">
+Approve
+</button>
+
+<button class="btn reject"
+onclick="rejectDeposit(
+'${docItem.id}'
+)">
+Reject
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+/* WITHDRAW REQUESTS */
+
+const withdrawSnap =
+await getDocs(
+collection(db,"withdrawRequests")
+);
+
+withdrawSnap.forEach((docItem)=>{
+
+document.getElementById(
+"withdrawEmpty"
+).style.display = "none";
+
+const data = docItem.data();
+
+totalWithdraw += Number(data.amount);
+
+document.getElementById(
+"withdrawContainer"
+).innerHTML += `
+
+<div class="request-box">
+
+<p><b>Emai
+
+</div>
+
+`;
+
+});
+
+/* USERS */
+
+const usersSnap =
+await getDocs(
+collection(db,"users")
+);
+
+usersSnap.forEach((docItem)=>{
+
+document.getElementById(
+"usersEmpty"
+).style.display = "none";
+
+const data = docItem.data();
+
+totalUsers++;
+
+document.getElementById(
+"usersContainer"
+).innerHTML += `
+
+<div class="request-box">
+
+<p><b>Name:</b>
+${data.name}</p>
+
+<p><b>Email:</b>
+${data.email}</p>
+
+<p><b>Balance:</b>
+PKR ${data.balance}</p>
+
+</div>
+
+`;
+
+});
+
+/* TOP STATS */
+
+document.getElementById(
+"totalUsers"
+).innerHTML = totalUsers;
+
+document.getElementById(
+"totalDeposit"
+).innerHTML = "PKR " + totalDeposit;
+
+document.getElementById(
+"totalWithdraw"
+).innerHTML = "PKR " + totalWithdraw;
+
+document.getElementById(
+"totalProfit"
+).innerHTML =
+"PKR " + (totalDeposit - totalWithdraw);
+
+/* APPROVE DEPOSIT */
+
+window.approveDeposit =
+async function(requestId,email,amount){
+
+const usersSnap =
+await getDocs(
+collection(db,"users")
+);
+
+usersSnap.forEach(async(userDoc)=>{
+
+const userData =
+userDoc.data();
+
+if(userData.email === email){
+
+const userRef =
+doc(db,"users",userDoc.id);
+
+const currentBalance =
+Number(userData.balance);
+
+await updateDoc(userRef,{
+
+balance:
+currentBalance + Number(amount)
+
+});
+
+}
+
+});
+
+const depositRef =
+doc(db,"depositRequests",requestId);
+
+await updateDoc(depositRef,{
+
+status:"Approved"
+
+});
+
+alert("Deposit Approved");
+
+location.reload();
+
+}
+
+/* REJECT DEPOSIT */
+
+window.rejectDeposit =
+async function(requestId){
+
+const depositRef =
+doc(db,"depositRequests",requestId);
+
+await updateDoc(depositRef,{
+
+status:"Rejected"
+
+});
+
+alert("Deposit Rejected");
+
+location.reload();
+
+}
+
+</script>
+
+
+</body>
+
+</html>
